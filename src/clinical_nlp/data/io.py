@@ -1,0 +1,25 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Optional
+
+
+def read_jsonl(path: str, limit: Optional[int] = None) -> list[dict]:
+    records = []
+    with Path(path).open("r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                records.append(json.loads(line))
+                if limit is not None and len(records) >= limit:
+                    break
+    return records
+
+
+def write_jsonl(path: str, records: list[dict]) -> None:
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("w", encoding="utf-8") as f:
+        for row in records:
+            f.write(json.dumps(row) + "\n")

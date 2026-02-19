@@ -1,0 +1,12 @@
+pipeline:
+  transformer_model: emilyalsentzer/Bio_ClinicalBERT
+  redact_by_default: true
+
+training:
+  bilstm:
+    epochs: 5
+    lr: 0.001
+  transformer:
+    epochs: 3
+    batch_size: 16
+    learning_rate: 2e-5

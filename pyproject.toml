@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clinical-nlp-pipeline"
+version = "0.1.0"
+description = "Clinical NLP pipeline for PHI de-identification and medical entity extraction"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{name = "Soumith"}]
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn>=0.30.0",
+  "pydantic>=2.8.0",
+  "numpy>=1.26.0",
+  "torch>=2.2.0",
+  "transformers>=4.44.0",
+  "python-multipart>=0.0.9",
+  "streamlit>=1.36.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "httpx>=0.27.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
