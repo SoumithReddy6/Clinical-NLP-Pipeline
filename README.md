@@ -1,4 +1,7 @@
 # Clinical NLP Pipeline: PHI De-identification + Medical NER
+## [Live Demo]([https://YOUR-APP-URL.streamlit.app](https://clinical-nlp-pipeline-aoy4w3niqdwxn3f3jpgekw.streamlit.app))
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://YOUR-APP-URL.streamlit.app)
 
 Production-style masters-level project for clinical note processing:
 - Hybrid NER (`BiLSTM-CRF` + transformer token classifier) for `diagnosis`, `medication`, `dosage`, `procedure`
