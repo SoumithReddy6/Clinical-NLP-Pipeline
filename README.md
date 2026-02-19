@@ -1,5 +1,5 @@
 # Clinical NLP Pipeline: PHI De-identification + Medical NER
-## [Live Demo]([https://YOUR-APP-URL.streamlit.app](https://clinical-nlp-pipeline-aoy4w3niqdwxn3f3jpgekw.streamlit.app)) 🚀
+## [Live Demo]([https://YOUR-APP-URL.streamlit.app](https://clinical-nlp-pipeline-aoy4w3niqdwxn3f3jpgekw.streamlit.app) 🚀
 
 
 Production-style masters-level project for clinical note processing:
