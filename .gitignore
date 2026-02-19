@@ -6,3 +6,4 @@ artifacts/
 .DS_Store
 data/synthetic/*.jsonl
 data/synthetic/*.jsonl
+data/synthetic/*.jsonl
