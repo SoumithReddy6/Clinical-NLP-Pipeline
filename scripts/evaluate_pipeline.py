@@ -25,7 +25,7 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=1000)
     args = parser.parse_args()
 
-    rows = read_jsonl(args.data)[: args.limit]
+    rows = read_jsonl(args.data, limit=args.limit if args.limit > 0 else None)
     pipe = ClinicalNLPPipeline()
 
     all_pred = []

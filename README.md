@@ -36,6 +36,8 @@ python scripts/generate_synthetic.py \
 ```bash
 python scripts/train_bilstm_crf.py \
   --train data/synthetic/clinical_notes_100k.jsonl \
+  --max-samples 20000 \
+  --batch-size 256 \
   --epochs 5 \
   --save-dir artifacts/bilstm_crf
 ```
@@ -63,6 +65,14 @@ python scripts/evaluate_pipeline.py \
 uvicorn clinical_nlp.api.main:app --host 0.0.0.0 --port 8000
 ```
 
+### Run Streamlit Web UI
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Then open: `http://localhost:8501`
+
 Example request:
 
 ```bash
@@ -77,6 +87,11 @@ curl -X POST http://localhost:8000/extract \
 docker build -t clinical-nlp-pipeline .
 docker run -p 8000:8000 clinical-nlp-pipeline
 ```
+
+## Lightweight website deployment options
+
+- Streamlit Community Cloud: deploy directly from your GitHub repo (`streamlit_app.py` as entrypoint)
+- Render/Railway: run with start command `streamlit run streamlit_app.py --server.port $PORT --server.address 0.0.0.0`
 
 ## Benchmarks and real datasets
 

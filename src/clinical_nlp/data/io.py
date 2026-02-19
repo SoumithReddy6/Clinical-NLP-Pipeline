@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Optional
 
 
-def read_jsonl(path: str) -> list[dict]:
+def read_jsonl(path: str, limit: Optional[int] = None) -> list[dict]:
     records = []
     with Path(path).open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
                 records.append(json.loads(line))
+                if limit is not None and len(records) >= limit:
+                    break
     return records
 
 
