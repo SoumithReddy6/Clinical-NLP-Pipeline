@@ -2,12 +2,26 @@
 ## [Live Demo]([https://YOUR-APP-URL.streamlit.app](https://clinical-nlp-pipeline-aoy4w3niqdwxn3f3jpgekw.streamlit.app) 🚀
 
 
-Production-style masters-level project for clinical note processing:
-- Hybrid NER (`BiLSTM-CRF` + transformer token classifier) for `diagnosis`, `medication`, `dosage`, `procedure`
-- PHI de-identification for 18 HIPAA Safe Harbor categories (hybrid rule + model-ready interface)
-- Clinical preprocessing: abbreviation expansion (5,000+ dictionary support), section segmentation, sentence splitting
-- FastAPI + Docker deployment with batch processing
-- Synthetic large-scale data generation and benchmark-compatible adapters
+## Project Description
+
+This project is an end-to-end **Clinical NLP pipeline** for processing unstructured medical notes.  
+It focuses on two core tasks:
+
+1. **PHI De-identification**: Detects and redacts protected health information (PHI) across HIPAA-relevant categories.
+2. **Medical Entity Extraction**: Identifies key clinical entities such as **diagnoses, medications, dosages, and procedures**.
+
+The system combines rule-based clinical text processing (abbreviation expansion, section segmentation, sentence splitting) with a hybrid NER approach using **BiLSTM-CRF** and a **transformer-based model**. It is exposed through both a **FastAPI REST API** and a **Streamlit web app** for interactive demos and batch workflows.
+
+### Key Features
+- Clinical note preprocessing pipeline
+- PHI detection + redaction module (18-category framework)
+- Hybrid NER architecture (BiLSTM-CRF + transformer + ensemble merge)
+- Batch and single-document inference
+- FastAPI deployment and Streamlit live demo
+- Synthetic large-scale dataset generator and benchmark-style data adapters
+
+> Note: This repository uses **synthetic clinical data by default** for safe public demonstration and development.
+
 
 ## Architecture
 
