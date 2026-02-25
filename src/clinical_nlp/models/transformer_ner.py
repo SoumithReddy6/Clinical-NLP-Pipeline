@@ -195,15 +195,26 @@ class HeuristicClinicalNER:
         "spinal fusion", "total hip arthroplasty", "total knee arthroplasty",
     }
 
+    # Matches dosages like "500mg", "10 mg", "0.5 mcg", "100 units"
     DOSAGE_PATTERN = re.compile(
         r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|units?|meq|%)\b", re.IGNORECASE
+    )
+    # Matches split dosages like "500 mg daily" -> captures "500 mg"
+    DOSAGE_SPLIT_PATTERN = re.compile(
+        r"\b(\d+(?:\.\d+)?)\s+(mg|mcg|g|ml|units?|meq|%)\b", re.IGNORECASE
     )
 
     def predict(self, text: str) -> list[TransformerPrediction]:
         spans: list[TransformerPrediction] = []
         text_lower = text.lower()
 
-        # Multi-word entity matching
+        # 1. Dosage pattern matching FIRST (highest priority to prevent fragmentation)
+        for m in self.DOSAGE_PATTERN.finditer(text):
+            spans.append(TransformerPrediction(
+                m.start(), m.end(), m.group(), "DOSAGE", 0.92
+            ))
+
+        # 2. Multi-word entity matching
         for phrase_set, label, score in [
             (self.DIAGNOSES_MULTI, "DIAGNOSIS", 0.88),
             (self.PROCEDURES_MULTI, "PROCEDURE", 0.85),
@@ -220,21 +231,17 @@ class HeuristicClinicalNER:
                     ))
                     start = idx + 1
 
-        # Single-word matching
+        # 3. Single-word matching (skip pure numbers to avoid dosage fragmentation)
         for tok, s, e in tokenize_with_offsets(text):
             t = tok.lower()
+            if t.isdigit():
+                continue  # Skip bare numbers — they belong to dosage spans
             if t in self.DIAGNOSES:
                 spans.append(TransformerPrediction(s, e, tok, "DIAGNOSIS", 0.90))
             elif t in self.MEDS:
                 spans.append(TransformerPrediction(s, e, tok, "MEDICATION", 0.90))
             elif t in self.PROCEDURES:
                 spans.append(TransformerPrediction(s, e, tok, "PROCEDURE", 0.88))
-
-        # Dosage pattern matching
-        for m in self.DOSAGE_PATTERN.finditer(text):
-            spans.append(TransformerPrediction(
-                m.start(), m.end(), m.group(), "DOSAGE", 0.92
-            ))
 
         # Deduplicate: sort by start, prefer longer spans
         spans.sort(key=lambda x: (x.start, -(x.end - x.start)))
