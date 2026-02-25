@@ -36,7 +36,11 @@ def get_pipeline() -> ClinicalNLPPipeline:
 
 
 def _annotated_text_html(text: str, entities: list, phi_spans: list) -> str:
-    """Build HTML with colored entity and PHI highlights."""
+    """Build HTML with colored entity and PHI highlights.
+
+    Uses inline-block spans so that each annotated entity wraps as a single
+    unit regardless of browser width, preventing label/text misalignment.
+    """
     spans = []
     for e in entities:
         d = e if isinstance(e, dict) else e.model_dump()
@@ -73,12 +77,18 @@ def _annotated_text_html(text: str, entities: list, phi_spans: list) -> str:
         if s["start"] > cursor:
             parts.append(_escape(text[cursor:s["start"]]))
         neg_style = "text-decoration:line-through;" if s["negated"] else ""
+        entity_text = _escape(text[s["start"]:s["end"]])
+        label = s["label"]
+        color = s["color"]
+        # inline-block keeps the entity + label together as one unit on wrap
         parts.append(
-            f'<span style="background-color:{s["color"]};padding:2px 4px;'
-            f'border-radius:4px;{neg_style}font-size:0.95em;">'
-            f'{_escape(text[s["start"]:s["end"]])}'
-            f'<sup style="font-size:0.7em;font-weight:bold;margin-left:2px;">'
-            f'{s["label"]}</sup></span>'
+            f'<mark style="background-color:{color};padding:2px 6px;'
+            f'border-radius:4px;{neg_style}display:inline-block;'
+            f'margin:1px 0;white-space:nowrap;line-height:1.4;">'
+            f'{entity_text}'
+            f'<span style="font-size:0.65em;font-weight:bold;margin-left:3px;'
+            f'vertical-align:super;opacity:0.8;">{label}</span>'
+            f'</mark>'
         )
         cursor = s["end"]
     if cursor < len(text):
@@ -166,7 +176,8 @@ def render_single_note(pipeline: ClinicalNLPPipeline) -> None:
             html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
             st.markdown(
                 f'<div style="background:#fafafa;padding:16px;border-radius:8px;'
-                f'line-height:1.8;font-family:monospace;">{html}</div>',
+                f'line-height:2.2;font-family:sans-serif;font-size:0.95em;'
+                f'word-wrap:break-word;overflow-wrap:break-word;">{html}</div>',
                 unsafe_allow_html=True,
             )
             st.divider()
@@ -261,7 +272,8 @@ def render_batch(pipeline: ClinicalNLPPipeline) -> None:
                 html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
                 st.markdown(
                     f'<div style="background:#fafafa;padding:12px;border-radius:8px;'
-                    f'line-height:1.8;font-family:monospace;font-size:0.9em;">{html}</div>',
+                    f'line-height:2.2;font-family:sans-serif;font-size:0.9em;'
+                    f'word-wrap:break-word;overflow-wrap:break-word;">{html}</div>',
                     unsafe_allow_html=True,
                 )
                 st.json(outputs[i])
