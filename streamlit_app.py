@@ -80,14 +80,14 @@ def _annotated_text_html(text: str, entities: list, phi_spans: list) -> str:
         entity_text = _escape(text[s["start"]:s["end"]])
         label = s["label"]
         color = s["color"]
-        # inline-block keeps the entity + label together as one unit on wrap
+        # Use box-decoration-break so padding/background works across line wraps
         parts.append(
-            f'<mark style="background-color:{color};padding:2px 6px;'
-            f'border-radius:4px;{neg_style}display:inline-block;'
-            f'margin:1px 0;white-space:nowrap;line-height:1.4;">'
+            f'<mark style="background-color:{color};padding:1px 4px;'
+            f'border-radius:3px;{neg_style}'
+            f'box-decoration-break:clone;-webkit-box-decoration-break:clone;">'
             f'{entity_text}'
-            f'<span style="font-size:0.65em;font-weight:bold;margin-left:3px;'
-            f'vertical-align:super;opacity:0.8;">{label}</span>'
+            f'<sub style="font-size:0.6em;font-weight:700;margin-left:2px;'
+            f'opacity:0.7;">{label}</sub>'
             f'</mark>'
         )
         cursor = s["end"]
@@ -176,8 +176,7 @@ def render_single_note(pipeline: ClinicalNLPPipeline) -> None:
             html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
             st.markdown(
                 f'<div style="background:#fafafa;padding:16px;border-radius:8px;'
-                f'line-height:2.2;font-family:sans-serif;font-size:0.95em;'
-                f'word-wrap:break-word;overflow-wrap:break-word;">{html}</div>',
+                f'line-height:2.0;font-size:0.95em;">{html}</div>',
                 unsafe_allow_html=True,
             )
             st.divider()
@@ -272,8 +271,7 @@ def render_batch(pipeline: ClinicalNLPPipeline) -> None:
                 html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
                 st.markdown(
                     f'<div style="background:#fafafa;padding:12px;border-radius:8px;'
-                    f'line-height:2.2;font-family:sans-serif;font-size:0.9em;'
-                    f'word-wrap:break-word;overflow-wrap:break-word;">{html}</div>',
+                    f'line-height:2.0;font-size:0.9em;">{html}</div>',
                     unsafe_allow_html=True,
                 )
                 st.json(outputs[i])
