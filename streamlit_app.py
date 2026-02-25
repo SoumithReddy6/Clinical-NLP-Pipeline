@@ -83,7 +83,7 @@ def _annotated_text_html(text: str, entities: list, phi_spans: list) -> str:
         # Use box-decoration-break so padding/background works across line wraps
         parts.append(
             f'<mark style="background-color:{color};padding:1px 4px;'
-            f'border-radius:3px;{neg_style}'
+            f'border-radius:3px;color:#222;{neg_style}'
             f'box-decoration-break:clone;-webkit-box-decoration-break:clone;">'
             f'{entity_text}'
             f'<sub style="font-size:0.6em;font-weight:700;margin-left:2px;'
@@ -176,7 +176,7 @@ def render_single_note(pipeline: ClinicalNLPPipeline) -> None:
             html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
             st.markdown(
                 f'<div style="background:#fafafa;padding:16px;border-radius:8px;'
-                f'line-height:2.0;font-size:0.95em;">{html}</div>',
+                f'line-height:2.0;font-size:0.95em;color:#333;">{html}</div>',
                 unsafe_allow_html=True,
             )
             st.divider()
@@ -271,7 +271,7 @@ def render_batch(pipeline: ClinicalNLPPipeline) -> None:
                 html = _annotated_text_html(result.normalized_text, result.entities, result.phi)
                 st.markdown(
                     f'<div style="background:#fafafa;padding:12px;border-radius:8px;'
-                    f'line-height:2.0;font-size:0.9em;">{html}</div>',
+                    f'line-height:2.0;font-size:0.9em;color:#333;">{html}</div>',
                     unsafe_allow_html=True,
                 )
                 st.json(outputs[i])
