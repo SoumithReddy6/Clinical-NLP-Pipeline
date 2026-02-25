@@ -1,5 +1,7 @@
 # Clinical NLP Pipeline for Medical Record De-identification & Entity Extraction
 
+## [Live Demo](https://clinical-nlp-pipeline-aoy4w3niqdwxn3f3jpgekw.streamlit.app) 🚀
+
 An end-to-end clinical Natural Language Processing pipeline that performs **HIPAA-compliant PHI de-identification** (all 18 Safe Harbor categories) and **medical Named Entity Recognition** (NER) on clinical notes. Built with PyTorch, HuggingFace Transformers, FastAPI, and Streamlit.
 
 ## Features
