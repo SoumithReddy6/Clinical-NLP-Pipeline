@@ -1,12 +1,70 @@
 pipeline:
   transformer_model: emilyalsentzer/Bio_ClinicalBERT
   redact_by_default: true
+  max_length: 256
+
+ner:
+  labels:
+    - "O"
+    - "B-DIAGNOSIS"
+    - "I-DIAGNOSIS"
+    - "B-MEDICATION"
+    - "I-MEDICATION"
+    - "B-DOSAGE"
+    - "I-DOSAGE"
+    - "B-PROCEDURE"
+    - "I-PROCEDURE"
+  entity_types:
+    - DIAGNOSIS
+    - MEDICATION
+    - DOSAGE
+    - PROCEDURE
+
+deid:
+  hipaa_categories:
+    - NAME
+    - GEOGRAPHIC_SUBDIVISION
+    - DATES
+    - PHONE
+    - FAX
+    - EMAIL
+    - SSN
+    - MRN
+    - HEALTH_PLAN_BENEFICIARY
+    - ACCOUNT
+    - CERTIFICATE_LICENSE
+    - VEHICLE_IDENTIFIER
+    - DEVICE_IDENTIFIER
+    - URL
+    - IP_ADDRESS
+    - BIOMETRIC_IDENTIFIER
+    - FULL_FACE_PHOTO
+    - OTHER_UNIQUE_IDENTIFIER
 
 training:
   bilstm:
     epochs: 5
-    lr: 0.001
+    lr: 0.002
+    weight_decay: 0.01
+    hidden_dim: 128
+    embedding_dim: 64
+    num_layers: 2
+    dropout: 0.3
+    scheduler: onecycle
+
   transformer:
     epochs: 3
     batch_size: 16
     learning_rate: 2e-5
+    warmup_ratio: 0.1
+    weight_decay: 0.01
+    eval_split: 0.1
+    max_length: 256
+
+evaluation:
+  relaxed_matching: false
+  overlap_threshold: 0.5
+
+preprocessing:
+  abbreviation_file: data/resources/abbreviations_5200.tsv
+  negation_window: 60

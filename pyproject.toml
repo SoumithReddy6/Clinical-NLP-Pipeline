@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clinical-nlp-pipeline"
-version = "0.1.0"
-description = "Clinical NLP pipeline for PHI de-identification and medical entity extraction"
+version = "0.2.0"
+description = "Clinical NLP pipeline for HIPAA-compliant PHI de-identification and medical named entity extraction"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [{name = "Soumith"}]
@@ -17,7 +17,8 @@ dependencies = [
   "torch>=2.2.0",
   "transformers>=4.44.0",
   "python-multipart>=0.0.9",
-  "streamlit>=1.36.0"
+  "streamlit>=1.36.0",
+  "seqeval>=1.2.2"
 ]
 
 [project.optional-dependencies]

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 from clinical_nlp.preprocessing.abbreviations import load_abbreviation_map, expand_abbreviations
-from clinical_nlp.preprocessing.segmenter import split_sections, split_sentences
+from clinical_nlp.preprocessing.segmenter import split_sections, split_sentences, is_negated
 
 
 class ClinicalPreprocessor:

@@ -37,11 +37,14 @@ class BatchProcessRequest(BaseModel):
 
 class ProcessResponse(BaseModel):
     normalized_text: str
-    redacted_text: Optional[str]
-    entities: list[Entity]
-    phi: list[PHISpan]
-    sections: list[str]
+    redacted_text: Optional[str] = None
+    entities: list[Entity] = Field(default_factory=list)
+    phi: list[PHISpan] = Field(default_factory=list)
+    sections: list[str] = Field(default_factory=list)
+    entity_summary: Optional[dict] = None
 
 
 class BatchProcessResponse(BaseModel):
     results: list[ProcessResponse]
+    total_entities: int = 0
+    total_phi_spans: int = 0

@@ -10,7 +10,7 @@ from clinical_nlp.schemas import (
 )
 from clinical_nlp.pipeline.engine import ClinicalNLPPipeline
 
-app = FastAPI(title="Clinical NLP Pipeline", version="0.1.0")
+app = FastAPI(title="Clinical NLP Pipeline", version="0.2.0")
 pipeline = ClinicalNLPPipeline()
 
 
@@ -27,4 +27,10 @@ def extract(req: ProcessRequest) -> ProcessResponse:
 @app.post("/extract/batch", response_model=BatchProcessResponse)
 def extract_batch(req: BatchProcessRequest) -> BatchProcessResponse:
     results = [pipeline.process(doc, redact=req.redact) for doc in req.documents]
-    return BatchProcessResponse(results=results)
+    total_entities = sum(len(r.entities) for r in results)
+    total_phi_spans = sum(len(r.phi) for r in results)
+    return BatchProcessResponse(
+        results=results,
+        total_entities=total_entities,
+        total_phi_spans=total_phi_spans,
+    )

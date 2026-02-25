@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""Fine-tune a transformer model for clinical NER with BIO tagging.
+
+Supports train/eval split and per-entity-type metrics during training.
+"""
 from __future__ import annotations
 
 import argparse
@@ -75,29 +79,56 @@ class ListDataset:
 
 
 def compute_metrics(eval_pred):
+    """Compute token accuracy and per-entity-type accuracy."""
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
     mask = labels != -100
+
     correct = (preds == labels) & mask
     total = mask.sum()
     acc = float(correct.sum() / total) if total else 0.0
-    return {"token_accuracy": acc}
+
+    metrics = {"token_accuracy": acc}
+    for i, label_name in enumerate(LABELS):
+        if label_name == "O":
+            continue
+        label_mask = (labels == i) & mask
+        label_total = label_mask.sum()
+        if label_total > 0:
+            label_correct = ((preds == i) & label_mask).sum()
+            metrics[f"acc_{label_name}"] = float(label_correct / label_total)
+
+    return metrics
+
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--train", required=True)
+    parser = argparse.ArgumentParser(description="Fine-tune transformer for clinical NER")
+    parser.add_argument("--train", required=True, help="Training JSONL path")
     parser.add_argument("--model", default="emilyalsentzer/Bio_ClinicalBERT")
     parser.add_argument("--save-dir", required=True)
-    parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--lr", type=float, default=2e-5)
     parser.add_argument("--max-samples", type=int, default=5000)
+    parser.add_argument("--eval-split", type=float, default=0.1,
+                        help="Fraction of data for evaluation")
+    parser.add_argument("--warmup-ratio", type=float, default=0.1)
     args = parser.parse_args()
 
     examples = build_examples(args.train, limit=args.max_samples)
+    print(f"Built {len(examples)} examples with {len(LABELS)} BIO labels: {LABELS}")
+
+    # Train/eval split
+    split_idx = max(1, int(len(examples) * (1 - args.eval_split)))
+    train_examples = examples[:split_idx]
+    eval_examples = examples[split_idx:]
+    print(f"Train: {len(train_examples)}, Eval: {len(eval_examples)}")
+
     tokenizer = AutoTokenizer.from_pretrained(args.model)
-    enc_rows = tokenize_and_align(tokenizer, examples)
-    dataset = ListDataset(enc_rows)
+    train_enc = tokenize_and_align(tokenizer, train_examples)
+    eval_enc = tokenize_and_align(tokenizer, eval_examples)
+    train_dataset = ListDataset(train_enc)
+    eval_dataset = ListDataset(eval_enc)
 
     label2id = {l: i for i, l in enumerate(LABELS)}
     id2label = {i: l for i, l in enumerate(LABELS)}
@@ -111,18 +142,24 @@ def main() -> None:
     train_args = TrainingArguments(
         output_dir=args.save_dir,
         per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size * 2,
         learning_rate=args.lr,
         num_train_epochs=args.epochs,
+        warmup_ratio=args.warmup_ratio,
+        weight_decay=0.01,
         logging_steps=20,
+        eval_strategy="epoch",
         save_strategy="epoch",
+        load_best_model_at_end=True,
+        metric_for_best_model="token_accuracy",
         report_to=[],
     )
 
     trainer = Trainer(
         model=model,
         args=train_args,
-        train_dataset=dataset,
-        eval_dataset=dataset,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         tokenizer=tokenizer,
         data_collator=DataCollatorForTokenClassification(tokenizer),
         compute_metrics=compute_metrics,
